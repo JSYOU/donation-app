@@ -6,6 +6,7 @@ import { useState } from "react";
 import HeaderBar from "@/components/HeaderBar";
 import TabSwitcher from "@/components/TabSwitcher";
 import DonationList from "@/components/DonationList";
+import SelectBar from "@/components/SelectBar";
 
 const donations = [
   {
@@ -40,6 +41,17 @@ const donations = [
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState("公益團體");
+  const [isSearching, setIsSearching] = useState(false);
+
+  const [selectedCategory, setSelectedCategory] = useState("全部");
+
+  // mock search
+  const filteredDonations = donations.filter((item) => {
+    const matchTab = item.type === activeTab;
+    const matchCategory =
+      selectedCategory === "全部" || item.category === selectedCategory;
+    return matchTab && matchCategory;
+  });
 
   return (
     <>
@@ -50,7 +62,14 @@ export default function Page() {
 
       <div className="pt-[54px]">
         <TabSwitcher activeTab={activeTab} setActiveTab={setActiveTab} />
-        <DonationList donations={donations} />
+        {!isSearching && (
+          <SelectBar
+            onSearchClick={() => setIsSearching(true)}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+        )}
+        <DonationList donations={filteredDonations} />
       </div>
     </>
   );
