@@ -5,8 +5,10 @@ import { useState } from "react";
 
 import HeaderBar from "@/components/HeaderBar";
 import TabSwitcher from "@/components/TabSwitcher";
+import SearchBar from "@/components/SearchBar";
 import DonationList from "@/components/DonationList";
 import SelectBar from "@/components/SelectBar";
+import { useDebounce } from "@/hooks/useDebounce";
 
 const donations = [
   {
@@ -42,15 +44,21 @@ const donations = [
 export default function Page() {
   const [activeTab, setActiveTab] = useState("公益團體");
   const [isSearching, setIsSearching] = useState(false);
-
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("全部");
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
 
   // mock search
   const filteredDonations = donations.filter((item) => {
     const matchTab = item.type === activeTab;
     const matchCategory =
       selectedCategory === "全部" || item.category === selectedCategory;
-    return matchTab && matchCategory;
+    const matchSearch =
+      !debouncedSearchTerm ||
+      item.name.includes(debouncedSearchTerm) ||
+      item.description.includes(debouncedSearchTerm);
+
+    return matchTab && matchCategory && matchSearch;
   });
 
   return (
@@ -61,6 +69,14 @@ export default function Page() {
       <HeaderBar title="所有捐款項目" />
 
       <div className="pt-[54px]">
+        {isSearching && (
+          <SearchBar
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            onCancel={() => setIsSearching(false)}
+          />
+        )}
+
         <TabSwitcher activeTab={activeTab} setActiveTab={setActiveTab} />
         {!isSearching && (
           <SelectBar
@@ -69,6 +85,7 @@ export default function Page() {
             onSelectCategory={setSelectedCategory}
           />
         )}
+
         <DonationList donations={filteredDonations} />
       </div>
     </>
