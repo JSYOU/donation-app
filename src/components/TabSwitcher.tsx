@@ -1,15 +1,20 @@
 import React, { useRef, useEffect, useState } from "react";
+import { CampaignType } from "@/utils/api";
 
 interface TabSwitcherProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  activeTab: CampaignType;
+  setActiveTab: (tab: CampaignType) => void;
 }
 
 const TabSwitcher: React.FC<TabSwitcherProps> = ({
   activeTab,
   setActiveTab,
 }) => {
-  const tabs = ["公益團體", "捐款專案", "義賣商品"];
+  const tabs = [
+    { type: CampaignType.CHARITY, label: "公益團體" },
+    { type: CampaignType.PROJECT, label: "捐款專案" },
+    { type: CampaignType.PRODUCT, label: "義賣商品" },
+  ];
   const activeButtonRef = useRef<HTMLButtonElement>(null);
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
 
@@ -25,19 +30,19 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({
     <div className="relative border-b bg-white mb-[15px] pt-[15px] w-full">
       <div className="flex justify-evenly">
         {tabs.map((tab) => {
-          const isActive = activeTab === tab;
+          const isActive = activeTab === tab.type;
           return (
             <button
               ref={isActive ? activeButtonRef : null}
-              key={tab}
-              onClick={() => setActiveTab(tab)}
+              key={tab.type}
+              onClick={() => setActiveTab(tab.type)}
               className={`pb-3 text-center font-[PingFang TC] font-medium ${
                 isActive
                   ? "text-[16px] leading-[20px] text-[#000000E5]"
                   : "text-[14px] leading-[19px] text-[#00000080]"
               }`}
             >
-              {tab}
+              {tab.label}
             </button>
           );
         })}
