@@ -1,17 +1,19 @@
 import axios from "axios";
 
-export enum CampaignType {
-  CHARITY = "CHARITY", // 公益團體
-  PROJECT = "PROJECT", // 捐款專案
-  PRODUCT = "PRODUCT", // 義賣商品
+export enum Status {
+  DRAFT = "DRAFT",
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  COMPLETED = "COMPLETED",
 }
 
 export interface GetCampaignsParams {
   page: number;
   limit: number;
-  type?: CampaignType;
+  type?: string;
   category?: string;
   keyword?: string;
+  status?: Status;
 }
 
 export interface Campaign {
@@ -19,13 +21,33 @@ export interface Campaign {
   name: string;
   description: string | null;
   logoUrl: string | null;
-  category: string | null;
-  type: CampaignType;
+  category: string[];
+  type: string;
+  status: Status;
   createdAt: Date;
   updatedAt: Date;
 }
 
-interface Meta {
+export interface GetProjectsParams {
+  page: number;
+  limit: number;
+  category?: string;
+  keyword?: string;
+  status?: Status;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string | null;
+  bannerUrl: string | null;
+  category: string[];
+  status: Status;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Meta {
   page: number;
   limit: number;
   totalItems: number;
@@ -34,6 +56,11 @@ interface Meta {
 
 export interface GetCampaignsResponse {
   data: Campaign[];
+  meta: Meta;
+}
+
+export interface GetProjectsResponse {
+  data: Project[];
   meta: Meta;
 }
 
@@ -46,6 +73,15 @@ export const getCampaigns = async (
   params: GetCampaignsParams
 ): Promise<GetCampaignsResponse> => {
   const response = await apiClient.get<GetCampaignsResponse>("/campaigns", {
+    params,
+  });
+  return response.data;
+};
+
+export const getProjects = async (
+  params: GetProjectsParams
+): Promise<GetProjectsResponse> => {
+  const response = await apiClient.get<GetProjectsResponse>("/projects", {
     params,
   });
   return response.data;

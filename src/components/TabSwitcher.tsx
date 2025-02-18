@@ -1,9 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
-import { CampaignType } from "@/utils/api";
 
+export enum SwitchType {
+  CHARITY = "CHARITY",
+  PROJECT = "PROJECT",
+  PRODUCT = "PRODUCT",
+}
 interface TabSwitcherProps {
-  activeTab: CampaignType;
-  setActiveTab: (tab: CampaignType) => void;
+  activeTab: SwitchType;
+  setActiveTab: (tab: SwitchType) => void;
 }
 
 const TabSwitcher: React.FC<TabSwitcherProps> = ({
@@ -11,9 +15,9 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({
   setActiveTab,
 }) => {
   const tabs = [
-    { type: CampaignType.CHARITY, label: "公益團體" },
-    { type: CampaignType.PROJECT, label: "捐款專案" },
-    { type: CampaignType.PRODUCT, label: "義賣商品" },
+    { type: SwitchType.CHARITY, label: "公益團體" },
+    { type: SwitchType.PROJECT, label: "捐款專案" },
+    { type: SwitchType.PRODUCT, label: "義賣商品" },
   ];
   const activeButtonRef = useRef<HTMLButtonElement>(null);
   const [underlineStyle, setUnderlineStyle] = useState({ left: 0, width: 0 });
