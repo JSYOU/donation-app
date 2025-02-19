@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -11,7 +12,7 @@ import SelectBar from "@/components/SelectBar";
 import ProjectsList from "@/components/ProjectsList";
 import ProductsList from "@/components/ProductsList";
 
-export default function Page() {
+function PageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -98,5 +99,13 @@ export default function Page() {
         )}
       </div>
     </>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PageContent />
+    </Suspense>
   );
 }
