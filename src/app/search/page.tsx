@@ -1,7 +1,7 @@
 "use client";
 
-import Head from "next/head";
-import { useState, useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import HeaderBar from "@/components/HeaderBar";
 import TabSwitcher, { SwitchType } from "@/components/TabSwitcher";
@@ -12,9 +12,17 @@ import ProjectsList from "@/components/ProjectsList";
 import ProductsList from "@/components/ProductsList";
 
 export default function Page() {
-  const [activeTab, setActiveTab] = useState<SwitchType>(SwitchType.CHARITY);
-  const [selectedCategory, setSelectedCategory] = useState("全部");
-  const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const initialTab =
+    (searchParams.get("tab") as SwitchType) || SwitchType.CHARITY;
+  const initialCategory = searchParams.get("category") || "全部";
+  const initialKeyword = searchParams.get("keyword") || "";
+
+  const [activeTab, setActiveTab] = useState<SwitchType>(initialTab);
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [searchTerm, setSearchTerm] = useState(initialKeyword);
   const [isSearching, setIsSearching] = useState(false);
   const params = useMemo(
     () => ({
@@ -25,13 +33,26 @@ export default function Page() {
     [activeTab, selectedCategory, searchTerm]
   );
 
+  useEffect(() => {
+    const query = new URLSearchParams();
+
+    if (activeTab !== SwitchType.CHARITY) {
+      query.set("tab", activeTab);
+    }
+    if (selectedCategory !== "全部") {
+      query.set("category", selectedCategory);
+    }
+    if (searchTerm) {
+      query.set("keyword", searchTerm);
+    }
+
+    const search = query.toString();
+    router.replace(`?${search}`);
+  }, [activeTab, selectedCategory, searchTerm]);
+
   return (
     <>
-      <Head>
-        <title>所有捐款項目</title>
-      </Head>
       <HeaderBar title="所有捐款項目" />
-
       <div className="pt-[54px]">
         {isSearching && (
           <SearchBar

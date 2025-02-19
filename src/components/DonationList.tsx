@@ -7,15 +7,21 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface DonationListProps {
   params: Omit<GetCampaignsParams, "page" | "limit">;
+  limit?: number;
+  disableInfiniteScroll?: boolean;
 }
 
-export default function DonationList({ params }: DonationListProps) {
+export default function DonationList({
+  params,
+  limit = 10,
+  disableInfiniteScroll = false,
+}: DonationListProps) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOverlayLoading, setIsOverlayLoading] = useState(false);
   const [meta, setMeta] = useState<Meta>({
     page: 1,
-    limit: 10,
+    limit,
     totalItems: 0,
     totalPages: 0,
   });
@@ -56,6 +62,8 @@ export default function DonationList({ params }: DonationListProps) {
   };
 
   useEffect(() => {
+    if (disableInfiniteScroll) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (
@@ -76,7 +84,7 @@ export default function DonationList({ params }: DonationListProps) {
     return () => {
       if (currentRef) observer.unobserve(currentRef);
     };
-  }, [isLoading, meta, page]);
+  }, [disableInfiniteScroll, isLoading, meta, page]);
 
   if (isOverlayLoading) {
     return (
@@ -109,7 +117,7 @@ export default function DonationList({ params }: DonationListProps) {
           </div>
         </div>
       ))}
-      <div ref={observerRef} className="h-8" />
+      {!disableInfiniteScroll && <div ref={observerRef} className="h-8" />}
       {isLoading && (
         <div className="text-center py-3 justify-items-center">
           <LoadingSpinner />

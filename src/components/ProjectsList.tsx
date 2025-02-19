@@ -7,9 +7,15 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 
 interface ProjectsListProps {
   params: Omit<GetProjectsParams, "page" | "limit">;
+  limit?: number;
+  disableInfiniteScroll?: boolean;
 }
 
-export default function ProjectsList({ params }: ProjectsListProps) {
+export default function ProjectsList({
+  params,
+  limit = 10,
+  disableInfiniteScroll = false,
+}: ProjectsListProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [page, setPage] = useState(1);
 
@@ -18,7 +24,7 @@ export default function ProjectsList({ params }: ProjectsListProps) {
 
   const [meta, setMeta] = useState<Meta>({
     page: 1,
-    limit: 10,
+    limit,
     totalItems: 0,
     totalPages: 0,
   });
@@ -59,6 +65,7 @@ export default function ProjectsList({ params }: ProjectsListProps) {
   };
 
   useEffect(() => {
+    if (disableInfiniteScroll) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !isLoading && page <= meta.totalPages) {
@@ -74,7 +81,7 @@ export default function ProjectsList({ params }: ProjectsListProps) {
     return () => {
       if (currentRef) observer.unobserve(currentRef);
     };
-  }, [isLoading, meta, page]);
+  }, [disableInfiniteScroll, isLoading, meta, page]);
 
   if (isOverlayLoading) {
     return (
@@ -118,7 +125,7 @@ export default function ProjectsList({ params }: ProjectsListProps) {
           </div>
         </div>
       ))}
-      <div ref={observerRef} className="h-8" />
+      {!disableInfiniteScroll && <div ref={observerRef} className="h-8" />}
       {isLoading && (
         <div className="text-center py-3">
           <LoadingSpinner />

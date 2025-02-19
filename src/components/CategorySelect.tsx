@@ -3,21 +3,24 @@
 import React from "react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
-const categories = [
-  "全部",
-  "老人照護",
-  "兒少照護",
-  "動物保護",
-  "身心障礙",
-  "災難救助",
-  "特殊疾病",
-  "原住民族",
-  "社區發展",
-  "勸募救助",
-  "教育扶助",
-  "醫療救助",
-  "弱勢兒少",
-];
+export enum Categories {
+  "全部" = "全部",
+  "兒少照護" = "兒少照護",
+  "動物保護" = "動物保護",
+  "老人照護" = "老人照護",
+  "身心障礙服務" = "身心障礙服務",
+  "特殊醫病" = "特殊醫病",
+  "婦女關懷" = "婦女關懷",
+  "教育議題提倡" = "教育議題提倡",
+  "環境保護" = "環境保護",
+  "多元族群" = "多元族群",
+  "媒體傳播" = "媒體傳播",
+  "公共議題" = "公共議題",
+  "文教藝術" = "文教藝術",
+  "社區發展" = "社區發展",
+  "弱勢扶貧" = "弱勢扶貧",
+  "國際救援" = "國際救援",
+}
 
 interface CategorySelectProps {
   showModal: boolean;
@@ -57,7 +60,7 @@ const CategorySelect: React.FC<CategorySelectProps> = ({
         </div>
 
         <div className="grid grid-cols-3 gap-2 mb-4">
-          {categories.map((cat) => (
+          {Object.values(Categories).map((cat) => (
             <button
               key={cat}
               onClick={() => {
