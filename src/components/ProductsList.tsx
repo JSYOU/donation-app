@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { getProducts, GetProductsParams, Product, Meta } from "@/utils/api";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface ProductsListProps {
   params: Omit<GetProductsParams, "page" | "limit">;
@@ -29,11 +30,18 @@ export default function ProductsList({
 
   const observerRef = useRef<HTMLDivElement>(null);
 
+  const debouncedParams = useDebounce(params, 500);
+
   useEffect(() => {
     setPage(1);
     setIsOverlayLoading(true);
     loadData(true);
-  }, [params.category, params.keyword, params.status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    debouncedParams.category,
+    debouncedParams.keyword,
+    debouncedParams.status,
+  ]);
 
   const loadData = async (reset = false) => {
     if (isLoading) return;
@@ -41,7 +49,7 @@ export default function ProductsList({
 
     try {
       const response = await getProducts({
-        ...params,
+        ...debouncedParams,
         page: reset ? 1 : page,
         limit: meta.limit || 10,
       });
@@ -79,7 +87,8 @@ export default function ProductsList({
     return () => {
       if (currentRef) observer.unobserve(currentRef);
     };
-  }, [disableInfiniteScroll, isLoading, page, meta]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disableInfiniteScroll, isLoading, page, meta.totalPages]);
 
   if (isOverlayLoading) {
     return (

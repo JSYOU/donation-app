@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { getCampaigns, GetCampaignsParams, Campaign, Meta } from "@/utils/api";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface DonationListProps {
   params: Omit<GetCampaignsParams, "page" | "limit">;
@@ -29,10 +30,13 @@ export default function DonationList({
 
   const observerRef = useRef<HTMLDivElement>(null);
 
+  const debouncedParams = useDebounce(params, 500);
+
   useEffect(() => {
     loadData(true);
     setIsOverlayLoading(true);
-  }, [params.type, params.category, params.keyword]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedParams.type, debouncedParams.category, debouncedParams.keyword]);
 
   const loadData = async (reset = false) => {
     if (isLoading) return;
@@ -40,7 +44,7 @@ export default function DonationList({
 
     try {
       const response = await getCampaigns({
-        ...params,
+        ...debouncedParams,
         ...meta,
         page: reset ? 1 : page,
       });
@@ -84,6 +88,7 @@ export default function DonationList({
     return () => {
       if (currentRef) observer.unobserve(currentRef);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disableInfiniteScroll, isLoading, meta, page]);
 
   if (isOverlayLoading) {

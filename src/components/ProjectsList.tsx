@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { getProjects, GetProjectsParams, Project, Meta } from "@/utils/api";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { useDebounce } from "@/hooks/useDebounce";
 
 interface ProjectsListProps {
   params: Omit<GetProjectsParams, "page" | "limit">;
@@ -18,7 +19,6 @@ export default function ProjectsList({
 }: ProjectsListProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [page, setPage] = useState(1);
-
   const [isLoading, setIsLoading] = useState(false);
   const [isOverlayLoading, setIsOverlayLoading] = useState(false);
 
@@ -30,12 +30,18 @@ export default function ProjectsList({
   });
 
   const observerRef = useRef<HTMLDivElement>(null);
+  const debouncedParams = useDebounce(params, 500);
 
   useEffect(() => {
     setPage(1);
     setIsOverlayLoading(true);
     loadData(true);
-  }, [params.category, params.keyword, params.status]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    debouncedParams.category,
+    debouncedParams.keyword,
+    debouncedParams.status,
+  ]);
 
   const loadData = async (reset = false) => {
     if (isLoading) return;
@@ -43,7 +49,7 @@ export default function ProjectsList({
 
     try {
       const response = await getProjects({
-        ...params,
+        ...debouncedParams,
         page: reset ? 1 : page,
         limit: meta.limit || 10,
       });
@@ -81,7 +87,8 @@ export default function ProjectsList({
     return () => {
       if (currentRef) observer.unobserve(currentRef);
     };
-  }, [disableInfiniteScroll, isLoading, meta, page]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disableInfiniteScroll, isLoading, meta.totalPages, page]);
 
   if (isOverlayLoading) {
     return (
