@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "docker:build": "docker build -t donation-app .",
+    "docker:run": "docker run --rm -p 3000:3000 --name donation-container donation-app"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
