@@ -17,13 +17,22 @@ export default function Page() {
 
   const initialTab =
     (searchParams.get("tab") as SwitchType) || SwitchType.CHARITY;
+  const [isSearching, setIsSearching] = useState(true);
   const initialCategory = searchParams.get("category") || "全部";
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const initialKeyword = searchParams.get("keyword") || "";
+  const [searchTerm, setSearchTerm] = useState(initialKeyword);
 
   const [activeTab, setActiveTab] = useState<SwitchType>(initialTab);
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [searchTerm, setSearchTerm] = useState(initialKeyword);
-  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    if (isSearching) {
+      setSelectedCategory("全部");
+    } else {
+      setSearchTerm("");
+    }
+  }, [isSearching]);
+
   const params = useMemo(
     () => ({
       type: activeTab,
@@ -48,7 +57,9 @@ export default function Page() {
 
     const search = query.toString();
     router.replace(`?${search}`);
-  }, [activeTab, selectedCategory, searchTerm]);
+  }, [activeTab, selectedCategory, searchTerm, router]);
+
+  const shouldShowData = !isSearching || (isSearching && searchTerm);
 
   return (
     <>
@@ -72,9 +83,19 @@ export default function Page() {
           />
         )}
 
-        {activeTab === SwitchType.CHARITY && <DonationList params={params} />}
-        {activeTab === SwitchType.PROJECT && <ProjectsList params={params} />}
-        {activeTab === SwitchType.PRODUCT && <ProductsList params={params} />}
+        {shouldShowData && (
+          <>
+            {activeTab === SwitchType.CHARITY && (
+              <DonationList params={params} />
+            )}
+            {activeTab === SwitchType.PROJECT && (
+              <ProjectsList params={params} />
+            )}
+            {activeTab === SwitchType.PRODUCT && (
+              <ProductsList params={params} />
+            )}
+          </>
+        )}
       </div>
     </>
   );
