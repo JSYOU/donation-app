@@ -64,6 +64,38 @@ export interface GetProjectsResponse {
   meta: Meta;
 }
 
+export interface ProductVariant {
+  price: number;
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  brandName: string;
+  description: string;
+  imageUrl: string;
+  category: string[];
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  variants: ProductVariant[];
+  priceMin: number;
+  priceMax: number;
+}
+
+export interface GetProductsResponse {
+  data: Product[];
+  meta: Meta;
+}
+
+export interface GetProductsParams {
+  page: number;
+  limit: number;
+  category?: string;
+  keyword?: string;
+  status?: string;
+}
+
 const apiClient = axios.create({
   baseURL: "http://localhost:8080/api/v1",
   timeout: 10000,
@@ -82,6 +114,15 @@ export const getProjects = async (
   params: GetProjectsParams
 ): Promise<GetProjectsResponse> => {
   const response = await apiClient.get<GetProjectsResponse>("/projects", {
+    params,
+  });
+  return response.data;
+};
+
+export const getProducts = async (
+  params: GetProductsParams
+): Promise<GetProductsResponse> => {
+  const response = await apiClient.get<GetProductsResponse>("/products", {
     params,
   });
   return response.data;

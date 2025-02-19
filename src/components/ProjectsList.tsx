@@ -91,15 +91,13 @@ export default function ProjectsList({ params }: ProjectsListProps) {
           key={p.id}
           className="bg-white rounded-md overflow-hidden shadow w-fit"
         >
-          <div className="">
-            <Image
-              src={p.bannerUrl ?? "/fallback.png"}
-              alt={p.name}
-              width={640}
-              height={320}
-              className="object-cover"
-            />
-          </div>
+          <Image
+            src={p.bannerUrl ?? "/fallback.png"}
+            alt={p.name}
+            width={640}
+            height={320}
+            className="object-cover"
+          />
           <div className="p-3">
             <div className="text-sm text-red-600 font-medium">{p.name}</div>
             <div className="mt-1 text-base text-black font-semibold leading-snug">

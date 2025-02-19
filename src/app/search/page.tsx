@@ -9,6 +9,7 @@ import SearchBar from "@/components/SearchBar";
 import DonationList from "@/components/DonationList";
 import SelectBar from "@/components/SelectBar";
 import ProjectsList from "@/components/ProjectsList";
+import ProductsList from "@/components/ProductsList";
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState<SwitchType>(SwitchType.CHARITY);
@@ -52,7 +53,7 @@ export default function Page() {
 
         {activeTab === SwitchType.CHARITY && <DonationList params={params} />}
         {activeTab === SwitchType.PROJECT && <ProjectsList params={params} />}
-        {activeTab === SwitchType.PRODUCT && <DonationList params={params} />}
+        {activeTab === SwitchType.PRODUCT && <ProductsList params={params} />}
       </div>
     </>
   );
