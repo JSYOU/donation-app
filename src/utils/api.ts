@@ -1,5 +1,14 @@
 import axios from "axios";
 
+const BASE_URL = `${
+  process.env.NEXT_PUBLIC_API_BASEURL || "http://localhost:8080"
+}/api/v1`;
+
+const apiClient = axios.create({
+  baseURL: BASE_URL,
+  timeout: 10000,
+});
+
 export enum Status {
   DRAFT = "DRAFT",
   ACTIVE = "ACTIVE",
@@ -95,11 +104,6 @@ export interface GetProductsParams {
   keyword?: string;
   status?: string;
 }
-
-const apiClient = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
-  timeout: 10000,
-});
 
 export const getCampaigns = async (
   params: GetCampaignsParams
