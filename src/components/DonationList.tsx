@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getCampaigns, GetCampaignsParams, Campaign, Meta } from "@/utils/api";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useDebounce } from "@/hooks/useDebounce";
+import NoData from "@/components/NoData";
 
 interface DonationListProps {
   params: Omit<GetCampaignsParams, "page" | "limit">;
@@ -29,12 +30,12 @@ export default function DonationList({
   const [page, setPage] = useState(1);
 
   const observerRef = useRef<HTMLDivElement>(null);
-
   const debouncedParams = useDebounce(params, 500);
 
   useEffect(() => {
-    loadData(true);
+    setPage(1);
     setIsOverlayLoading(true);
+    loadData(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedParams.type, debouncedParams.category, debouncedParams.keyword]);
 
@@ -45,8 +46,8 @@ export default function DonationList({
     try {
       const response = await getCampaigns({
         ...debouncedParams,
-        ...meta,
         page: reset ? 1 : page,
+        limit: meta.limit || 10,
       });
 
       if (reset) {
@@ -58,7 +59,7 @@ export default function DonationList({
       }
       setMeta(response.meta);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load campaigns:", err);
     } finally {
       setIsLoading(false);
       setIsOverlayLoading(false);
@@ -70,12 +71,7 @@ export default function DonationList({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (
-          entry.isIntersecting &&
-          !isLoading &&
-          meta &&
-          page <= meta.totalPages
-        ) {
+        if (entry.isIntersecting && !isLoading && page <= meta.totalPages) {
           loadData();
         }
       },
@@ -89,7 +85,7 @@ export default function DonationList({
       if (currentRef) observer.unobserve(currentRef);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disableInfiniteScroll, isLoading, meta, page]);
+  }, [disableInfiniteScroll, isLoading, meta.totalPages, page]);
 
   if (isOverlayLoading) {
     return (
@@ -101,27 +97,31 @@ export default function DonationList({
 
   return (
     <div className="mx-4 my-3 space-y-[12px]">
-      {campaigns.map((c) => (
-        <div
-          key={c.id}
-          className="flex items-center p-[9px] bg-white rounded-md"
-        >
-          <Image
-            src={c.logoUrl ?? "/fallback.png"}
-            alt={c.name}
-            width={64}
-            height={64}
-          />
-          <div className="ml-3">
-            <h2 className="font-[PingFang TC] font-medium text-[16px] leading-[24px] text-[#000000E5]">
-              {c.name}
-            </h2>
-            <p className="mt-1 font-[PingFang TC] font-normal text-[13px] leading-[20px] text-[#000000B2]">
-              {c.description}
-            </p>
+      {params.keyword && campaigns.length === 0 ? (
+        <NoData />
+      ) : (
+        campaigns.map((c) => (
+          <div
+            key={c.id}
+            className="flex items-center p-[9px] bg-white rounded-md"
+          >
+            <Image
+              src={c.logoUrl ?? "/fallback.png"}
+              alt={c.name}
+              width={64}
+              height={64}
+            />
+            <div className="ml-3">
+              <h2 className="font-[PingFang TC] font-medium text-[16px] leading-[24px] text-[#000000E5]">
+                {c.name}
+              </h2>
+              <p className="mt-1 font-[PingFang TC] font-normal text-[13px] leading-[20px] text-[#000000B2]">
+                {c.description}
+              </p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
       {!disableInfiniteScroll && <div ref={observerRef} className="h-8" />}
       {isLoading && (
         <div className="text-center py-3 justify-items-center">
