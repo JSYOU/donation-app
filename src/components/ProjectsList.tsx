@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getProjects, GetProjectsParams, Project, Meta } from "@/utils/api";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useDebounce } from "@/hooks/useDebounce";
+import NoData from "@/components/NoData";
 
 interface ProjectsListProps {
   params: Omit<GetProjectsParams, "page" | "limit">;
@@ -100,38 +101,42 @@ export default function ProjectsList({
 
   return (
     <div className="mx-4 my-3 space-y-3 justify-items-center">
-      {projects.map((p) => (
-        <div
-          key={p.id}
-          className="bg-white rounded-md overflow-hidden shadow w-fit"
-        >
-          <Image
-            src={p.bannerUrl ?? "/fallback.png"}
-            alt={p.name}
-            width={640}
-            height={320}
-            className="object-cover"
-          />
-          <div className="p-3">
-            <div className="text-sm text-red-600 font-medium">{p.name}</div>
-            <div className="mt-1 text-base text-black font-semibold leading-snug">
-              {p.description}
-            </div>
-            {Array.isArray(p.category) && p.category.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1">
-                {p.category.map((cat) => (
-                  <span
-                    key={cat}
-                    className="inline-block px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded-md"
-                  >
-                    {cat}
-                  </span>
-                ))}
+      {params.keyword && projects.length === 0 ? (
+        <NoData />
+      ) : (
+        projects.map((p) => (
+          <div
+            key={p.id}
+            className="bg-white rounded-md overflow-hidden shadow w-fit"
+          >
+            <Image
+              src={p.bannerUrl ?? "/fallback.png"}
+              alt={p.name}
+              width={640}
+              height={320}
+              className="object-cover"
+            />
+            <div className="p-3">
+              <div className="text-sm text-red-600 font-medium">{p.name}</div>
+              <div className="mt-1 text-base text-black font-semibold leading-snug">
+                {p.description}
               </div>
-            )}
+              {Array.isArray(p.category) && p.category.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {p.category.map((cat) => (
+                    <span
+                      key={cat}
+                      className="inline-block px-2 py-1 bg-gray-100 text-xs text-gray-600 rounded-md"
+                    >
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
       {!disableInfiniteScroll && <div ref={observerRef} className="h-8" />}
       {isLoading && (
         <div className="text-center py-3">
