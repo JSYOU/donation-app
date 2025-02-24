@@ -115,7 +115,7 @@ export default function ProductsList({
             return (
               <div
                 key={prod.id}
-                className="bg-white rounded-md overflow-hidden shadow flex flex-col"
+                className="bg-white rounded-md overflow-hidden shadow flex flex-col w-fit"
               >
                 <Image
                   src={prod.imageUrl ?? "/fallback.png"}
